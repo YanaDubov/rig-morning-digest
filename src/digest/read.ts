@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { DigestRow, DigestStatus, ReadNight } from './types.js';
+import type { DigestRow, DigestStatus, NightCounts, ReadNight } from './types.js';
 
 type RunRecord = {
   at: string;
@@ -55,7 +55,7 @@ function parseRun(line: string): RunRecord | null {
   };
 }
 
-export const readNight: ReadNight = (runsDir, night) => {
+function readRuns(runsDir: string, night: string): { runs: RunRecord[]; badLines: number } {
   const contents = readFileSync(join(runsDir, `${night}.jsonl`), 'utf8');
   const lines = contents === '' ? [] : contents.split(/\r?\n/);
 
@@ -63,7 +63,7 @@ export const readNight: ReadNight = (runsDir, night) => {
     lines.pop();
   }
 
-  const jobs = new Map<string, Accumulator>();
+  const runs: RunRecord[] = [];
   let badLines = 0;
 
   for (const line of lines) {
@@ -74,6 +74,27 @@ export const readNight: ReadNight = (runsDir, night) => {
       continue;
     }
 
+    runs.push(run);
+  }
+
+  return { runs, badLines };
+}
+
+export function countNightStatuses(runsDir: string, night: string): NightCounts {
+  const counts: NightCounts = { ok: 0, retry: 0, fail: 0 };
+
+  for (const run of readRuns(runsDir, night).runs) {
+    counts[run.status] += 1;
+  }
+
+  return counts;
+}
+
+export const readNight: ReadNight = (runsDir, night) => {
+  const { runs, badLines } = readRuns(runsDir, night);
+  const jobs = new Map<string, Accumulator>();
+
+  for (const run of runs) {
     const time = Date.parse(run.at);
     const current = jobs.get(run.job);
 

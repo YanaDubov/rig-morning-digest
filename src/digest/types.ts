@@ -16,4 +16,6 @@ export type DigestResult = {
   badLines: number;
 };
 
+export type NightCounts = Record<DigestStatus, number>;
+
 export type ReadNight = (runsDir: string, night: string) => DigestResult;
