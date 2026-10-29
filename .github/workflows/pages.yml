@@ -1,0 +1,49 @@
+name: Deploy digest preview
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Save the digest as one HTML file
+        env:
+          LANE_ID: lane-07
+          LANE_MARKER: ${{ vars.LANE_MARKER }}
+          PORT: 8787
+        run: |
+          mkdir -p _site
+          pnpm start &
+          server_pid=$!
+          trap 'kill "$server_pid" 2>/dev/null || true' EXIT
+          curl --fail --retry 20 --retry-connrefused --retry-delay 1 \
+            http://127.0.0.1:8787/digest/2026-10-28 \
+            --output _site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
