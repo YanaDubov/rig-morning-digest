@@ -17,6 +17,19 @@ export function createApp(config: RigConfig = loadConfig()) {
 
   app.get('/health', (c) => c.json({ ok: true, lane: lane().id }));
 
+  app.get('/api/digest/:night', (c) => {
+    try {
+      const digest = readNight(config.runsDir, c.req.param('night'));
+      return c.json(orderDigestRows(digest.rows));
+    } catch (error) {
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+        return c.json({ error: 'night not found' }, 404);
+      }
+
+      throw error;
+    }
+  });
+
   app.get('/', (c) =>
     c.html(
       <Layout title="status" lane={lane()}>
