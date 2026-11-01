@@ -77,3 +77,13 @@ page again with `LANE_MARKER` unset (the banner reads "no marker set") and uploa
 link. Move this plan to `docs/plans/done/` with its issue list.
 
 Done when: the preview link no longer shows the lane marker.
+
+## Issues
+
+- [#1 · Read and aggregate a night's run log](https://github.com/YanaDubov/rig-morning-digest/issues/1)
+- [#2 · Render the digest HTML page](https://github.com/YanaDubov/rig-morning-digest/issues/2)
+- [#3 · Add the digest JSON API](https://github.com/YanaDubov/rig-morning-digest/issues/3)
+- [#4 · Link nightly digests from the status board](https://github.com/YanaDubov/rig-morning-digest/issues/4)
+- [#5 · Test digest HTML and JSON routes](https://github.com/YanaDubov/rig-morning-digest/issues/5)
+- [#6 · Publish the marked digest preview](https://github.com/YanaDubov/rig-morning-digest/issues/6)
+- [#7 · Remove the preview marker and finish the plan](https://github.com/YanaDubov/rig-morning-digest/issues/7)
